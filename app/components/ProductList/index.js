@@ -3,7 +3,6 @@ import { Button, Modal } from 'react-bootstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import * as productService from '../../services/product-service';
-import Gallery from 'react-grid-gallery';
 import Select from 'react-select';
 import { JSONEditor } from "react-schema-based-json-editor";
 let libraries = {};
