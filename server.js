@@ -3,7 +3,16 @@
 let express = require('express'),
     compression = require('compression'),
     products = require('./server/products'),
+    database = require('./server/database.js'),
     app = express();
+
+  try {
+    console.log('Initializing database module');
+    database.initialize(); 
+  } catch (err) {
+    console.error(err); 
+    process.exit(1); // Non-zero failure code
+  }
 
 app.set('port', process.env.PORT || 5000);
 
@@ -29,13 +38,7 @@ app.all('*', function (req, res, next) {
 });
 
 app.get('/products', products.findAll);
-//app.get('/products/:id', products.findById);
-app.get('/product/:frb_name', products.findByFRB);
-app.get('/ropnotes/:rop_id', products.findropnotes);
-app.get('/rmpnotes/:rmp_id', products.findrmpnotes);
-app.get('/frbnotes/:frb_id', products.findfrbnotes);
-app.get('/rmpimages/:rmp_id', products.findrmpimages);
-app.get('/rmppubs/:rmp_id', products.findrmppubs);
+app.get('/product/:prod_id', products.findByProdId);
 
 app.listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));

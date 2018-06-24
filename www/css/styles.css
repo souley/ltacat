@@ -200,6 +200,14 @@ tbody.selectcol {
 }
 
 /* begin custom bootstrap buttons */
+.btn-submit {
+    background: #4CAE4C;
+    border-color: #4CAE4C;
+    color: #FFFFFF;
+    width: 100%;
+    outline:none !important;
+}
+
 .btn-viscol {
     background: #0E65B2;
     border-color: #0E65B2;

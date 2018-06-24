@@ -19,10 +19,13 @@
     "compression": "^1.7.2",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
+    "oracledb": "^2.3.0",
     "path": "^0.12.7",
     "pg": "^7.4.1",
-    "react-grid-gallery": "^0.4.8",
-    "react-images": "^0.5.17"
+    "react-bootstrap-table-next": "^0.1.13",
+    "react-bootstrap-table2-paginator": "^0.1.4",
+    "react-schema-based-json-editor": "^7.15.1",
+    "react-select": "^1.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -34,7 +37,6 @@
     "npm-github-release": "^0.9.0",
     "react": "^16.2.0",
     "react-bootstrap": "^0.32.1",
-    "react-bootstrap-table": "^4.3.1",
     "react-dom": "^16.2.0",
     "react-modal": "^3.3.2",
     "update-to-latest": "^1.0.0",

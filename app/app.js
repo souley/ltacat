@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
-import FRBCatTXT from './components/FRBCatTXT';
+import LOFARCatTXT from './components/LOFARCatTXT';
 import ProductList from './components/ProductList';
 import * as productService from './services/product-service';
 
@@ -56,14 +56,11 @@ class App extends React.Component {
     }
 
     render() {
-        // get csvURL from config file
-        var config = require('../server/config'),
-        csvURL = config.csvURL;
         // return webpage
         return (
             <div>
-                <Header text="FRB Catalogue"/>
-                <FRBCatTXT csv={csvURL}/>
+                <Header text="LOFAR Processing Catalogue"/>
+                <LOFARCatTXT/>
                 <ProductList products={this.state.products} total={this.state.total} onSearchKeyChange={this.searchKeyChangeHandler.bind(this)}/>
                 <Footer text="footer"/>
             </div>
