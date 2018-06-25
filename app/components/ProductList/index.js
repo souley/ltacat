@@ -216,185 +216,76 @@ class PipelineConfigurator extends React.Component {
     // Pipelone json configurator
   constructor(props) {
     super(props);
-    this.state = { pipelineConfig: {},
-                   initialConfig: {}
+    this.state = { 
+      resultConfig: {},
+      submitted: false,
+      config: {},
+      error: ''
     };
-    this.findConfigProps = this.findConfigProps.bind(this);
     this.updateDerived = this.updateDerived.bind(this);
+    this.submit = this.submit.bind(this);
+    this.processResponse = this.processResponse.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
-  componentDidMount() {
-    this.findConfigProps(this.props.pipeline);
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.pipeline !== this.props.pipeline) {
-        this.findConfigProps(this.emptyObject(nextProps.pipeline));
-    }
-  }
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.props.pipeline !== nextProps.pipeline || nextState.pipelineConfig !== this.state.pipelineConfig
-  }
-  updateDerived() {
-    return
-  }
-  submit() {
-    return
-  }
-  emptyObject(obj) {
-    if (obj == null) {
-        return {}
-    }
-    else {
-        return obj
-    }
-  }
-  findConfigProps(pline) {
-    // Find configuration properties for selected pipeline
-    // hardcode for now
-    //this.props.pipeline
-  var schema = {
-  "type": "object",
-  "title": "Configuration Parameters:",
-  "description": "This is the LOFAR GRID Pre-Processing Pipeline. Here we print a description of the pipeline.",
-  "properties": {
-    "AVG_FREQ_STEP": {
-      "type": "integer",
-      "title": "AVG_FREQ_STEP",
-      "description": "corresponds to .freqstep in NDPPP .type=average , or in case of .type=demixer it is the demixer.freqstep",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 1
-    },
-    "AVG_TIME_STEP": {
-      "type": "integer",
-      "title": "AVG_TIME_STEP",
-      "description": "corresponds to .timestep in NDPPP .type=average , or in case of .type=demixer it is the demixer.timestep",
-      "default": 4,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 2
-    },
-    "DO_DEMIX": {
-      "type": "boolean",
-      "title": "DO_DEMIX",
-      "description": "if true then demixer instead of average is performed",
-      "default": true,
-      "propertyOrder": 3
-    },
-    "DEMIX_FREQ_STEP": {
-      "type": "integer",
-      "title": "DEMIX_FREQ_STEP",
-      "description": "corresponds to .demixfreqstep in NDPPP .type=demixer",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 4
-    },
-    "DEMIX_TIME_STEP": {
-      "type": "integer",
-      "title": "DEMIX_TIME_STEP",
-      "description": "corresponds to .demixtimestep in NDPPP .type=demixer",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 5
-    },
-    "DEMIX_SOURCES": {
-      "type": "string",
-      "description": "",
-      "title": "DEMIX_SOURCES",
-      "format": "select",
-      "enum": [
-        "CasA",
-        "CygA"
-      ],
-      "propertyOrder": 6
-    },
-    "SELECT_NL": {
-      "type": "boolean",
-      "title": "SELECT_NL",
-      "description": "if true then only Dutch stations are selected",
-      "default": true,
-      "propertyOrder": 7
-    },
-    "PARSET": {
-      "type": "string",
-      "title": "PARSET",
-      "description": "",
-      "format": "select",
-      "enum": [
-        "",
-        "hba_npp",
-        "hba_raw",
-        "lba_npp",
-        "lba_raw"
-      ],
-      "default": "lba_npp",
-      "propertyOrder": 8
-    },
-    "required": [
-        "AVG_FREQ_STEP",
-        "AVG_TIME_STEP",
-        "DO_DEMIX",
-        "DEMIX_FREQ_STEP",
-        "DEMIX_TIME_STEP",
-        "DEMIX_SOURCES",
-        "SELECT_NL",
-        "PARSET"
-    ]
-    }};
-    var initialValue = {
-        "AVG_FREQ_STEP": 2,
-        "AVG_TIME_STEP": 4,
-        "DO_DEMIX": true,
-        "DEMIX_FREQ_STEP": 2,
-        "DEMIX_TIME_STEP": 2,
-        "DEMIX_SOURCES": "CasA",
-        "SELECT_NL": true,
-        "PARSET": "lba_npp"
-    };
-    // catch TypeError: can't convert null to object
-    try {
-        if ( Object.getOwnPropertyNames(pline).length !== 0) {
-            this.setState({
-                pipelineConfig: schema,
-                initialConfig: initialValue,
-               });
-        } else {
-            this.setState({
-                pipelineConfig: {},
-                initialConfig: {},
-            });
-        }
-    } catch (e) {
-            this.setState({
-                pipelineConfig: {},
-                initialConfig: {},
-            });
-    }        
-  }
-  render () {
 
-    // make sure we have all images loaded before rendering the gallery
-    if ( Object.getOwnPropertyNames(this.state.pipelineConfig).length == 0 ) {
-      return (
-        <div></div>
-      );
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.props.pipeline !== nextProps.pipeline || nextState.submitted  !== this.state.submitted
+  }
+  updateDerived(config) {
+    this.setState({config});
+  }
+  processResponse(resultConfig) {
+    this.setState({submitted: true,
+                   resultConfig});
+  }
+  handleError(error) {
+    this.setState({submitted: true,
+                   error})
+  }
+
+  submit() {
+    const submitEndpoint = this.props.pipeline.endpoint
+    fetch(submitEndpoint, {
+        body: JSON.stringify(this.state.config), // must match 'Content-Type' header
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        headers: {
+          'content-type': 'application/json'
+        },
+      })
+      .then(response => {if (response.ok)
+                           return response.json()
+                         else
+                           throw 'Server returned ' + response.statusText})
+      .then(this.processResponse) // parses response to JSON
+      .catch(this.handleError)
+  }
+
+   render () {
+    if (this.state.submitted) {
+      if (this.state.error) {
+        return (
+          <div class="alert alert-danger" role="alert">
+            Submission failed {this.state.error}
+          </div>
+        );
+      } else {
+        return (
+          <div class="alert alert-success" role="alert">
+            Submitted, response from server:
+            <ul>
+              {Object.getOwnPropertyNames(this.state.resultConfig).map((key) => <li key={key}>{key}: {this.state.resultConfig[key]}</li>)}
+            </ul>
+          </div>
+        )
+      }
     } else {
       return (
         <div>
         <JSONEditor 
             title="Pipeline configuration"
-            schema={this.state.pipelineConfig}
-            initialValue={this.state.initialConfig}
+            schema={this.props.pipeline.schema}
+            initialValue={this.props.pipeline.initialValues}
             updateValue={this.updateDerived}
             theme="bootstrap4"
             icon="fontawesome5">
@@ -548,193 +439,12 @@ export default class FRBTable extends React.Component {
     super(props);
     this.state = { showModal: false,
       meas: {},
-      btnTitle: 'Verified events',
-      btnTooltip: 'Only verified events are shown',
-      verified: true,
-      CSVFilename: 'frbcat',
-      CSVExtension: 'csv',
       page: 1,
       sizePerPage: 25,
-      hiddenColumns: {
-        verified: true,
-        obs_type: true,
-        rop_receiver: true,
-        rop_backend: true,
-        rop_beam: true,
-        rop_beam_semi_major_axis: true,
-        rop_beam_semi_minor_axis: true,
-        rop_beam_rotation_angle: true,
-        rop_sampling_time: true,
-        rop_npol: true,
-        rop_bits_per_sample: true,
-        rop_gain: true,
-        rop_tsys: true,
-        rop_mw_dm_limit: true,
-        rop_galactic_electron_model: true,
-        rop_bandwidth: true,
-        rop_centre_frequency: true,
-        rmp_flux: true,
-        rmp_dm_index: true,
-        rmp_scattering_index: true,
-        rmp_scattering: true,
-        rmp_scattering_model: true,
-        rmp_scattering_timescale: true,
-        rmp_linear_poln_frac: true,
-        rmp_circular_poln_frac: true,
-        rmp_spectral_index: true,
-        rmp_rm: true,
-        rmp_redshift_host: true,
-        rmp_dispersion_smearing: true,
-      },
-      hiddenColumnsTemp: {
-        verified: true,
-        obs_type: true,
-        rop_receiver: true,
-        rop_backend: true,
-        rop_beam: true,
-        rop_beam_semi_major_axis: true,
-        rop_beam_semi_minor_axis: true,
-        rop_beam_rotation_angle: true,
-        rop_sampling_time: true,
-        rop_npol: true,
-        rop_bits_per_sample: true,
-        rop_gain: true,
-        rop_tsys: true,
-        rop_mw_dm_limit: true,
-        rop_galactic_electron_model: true,
-        rop_bandwidth: true,
-        rop_centre_frequency: true,
-        rmp_flux: true,
-        rmp_dm_index: true,
-        rmp_scattering_index: true,
-        rmp_scattering: true,
-        rmp_scattering_model: true,
-        rmp_scattering_timescale: true,
-        rmp_linear_poln_frac: true,
-        rmp_circular_poln_frac: true,
-        rmp_spectral_index: true,
-        rmp_rm: true,
-        rmp_redshift_host: true,
-        rmp_dispersion_smearing: true,
-      },
-      product : {},
-      arraylist: [],
       // dropdown
-      selectedOption: {},
-                   // schema
-                   schema: {
-  "type": "object",
-  "title": "Configuration Parameters:",
-  "description": "This is the LOFAR GRID Pre-Processing Pipeline. Here we print a description of the pipeline.",
-  "properties": {
-    "AVG_FREQ_STEP": {
-      "type": "integer",
-      "title": "AVG_FREQ_STEP",
-      "description": "corresponds to .freqstep in NDPPP .type=average , or in case of .type=demixer it is the demixer.freqstep",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 1
-    },
-    "AVG_TIME_STEP": {
-      "type": "integer",
-      "title": "AVG_TIME_STEP",
-      "description": "corresponds to .timestep in NDPPP .type=average , or in case of .type=demixer it is the demixer.timestep",
-      "default": 4,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 2
-    },
-    "DO_DEMIX": {
-      "type": "boolean",
-      "title": "DO_DEMIX",
-      "description": "if true then demixer instead of average is performed",
-      "default": true,
-      "propertyOrder": 3
-    },
-    "DEMIX_FREQ_STEP": {
-      "type": "integer",
-      "title": "DEMIX_FREQ_STEP",
-      "description": "corresponds to .demixfreqstep in NDPPP .type=demixer",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 4
-    },
-    "DEMIX_TIME_STEP": {
-      "type": "integer",
-      "title": "DEMIX_TIME_STEP",
-      "description": "corresponds to .demixtimestep in NDPPP .type=demixer",
-      "default": 2,
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "maximum": 1000,
-      "exclusiveMaximum": true,    
-      "propertyOrder": 5
-    },
-    "DEMIX_SOURCES": {
-      "type": "string",
-      "description": "",
-      "title": "DEMIX_SOURCES",
-      "format": "select",
-      "enum": [
-        "CasA",
-        "CygA"
-      ],
-      "propertyOrder": 6
-    },
-    "SELECT_NL": {
-      "type": "boolean",
-      "title": "SELECT_NL",
-      "description": "if true then only Dutch stations are selected",
-      "default": true,
-      "propertyOrder": 7
-    },
-    "PARSET": {
-      "type": "string",
-      "title": "PARSET",
-      "description": "",
-      "format": "select",
-      "enum": [
-        "",
-        "hba_npp",
-        "hba_raw",
-        "lba_npp",
-        "lba_raw"
-      ],
-      "default": "lba_npp",
-      "propertyOrder": 8
-    },
-    "required": [
-        "AVG_FREQ_STEP",
-        "AVG_TIME_STEP",
-        "DO_DEMIX",
-        "DEMIX_FREQ_STEP",
-        "DEMIX_TIME_STEP",
-        "DEMIX_SOURCES",
-        "SELECT_NL",
-        "PARSET"
-    ]
-    }},
-    initialValue: {
-        "AVG_FREQ_STEP": 2,
-        "AVG_TIME_STEP": 4,
-        "DO_DEMIX": true,
-        "DEMIX_FREQ_STEP": 2,
-        "DEMIX_TIME_STEP": 2,
-        "DEMIX_SOURCES": "CasA",
-        "SELECT_NL": true,
-        "PARSET": "lba_npp"
-    }
+      selectedOption: undefined,
+      selectedPipeline: undefined,
     };
-    this.openColumnDialog = this.openColumnDialog.bind(this);
-    this.applyColumnDialog = this.applyColumnDialog.bind(this);
     this.showall = this.showall.bind(this);
     this.closeColumnDialog = this.closeColumnDialog.bind(this);
     this.createCustomButtonGroup = this.createCustomButtonGroup.bind(this);
@@ -744,11 +454,130 @@ export default class FRBTable extends React.Component {
     this.sizePerPageListChange = this.sizePerPageListChange.bind(this);
     this.customInfoButton = this.customInfoButton.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.pipelines = { 
+      'LGPPP': {
+        label: 'LOFAR GRID Pre-Processing Pipeline',
+        schema: {
+            "type": "object",
+            "title": "Configuration Parameters:",
+            "description": "This is the LOFAR GRID Pre-Processing Pipeline. Here we print a description of the pipeline.",
+            "properties": {
+              "AVG_FREQ_STEP": {
+                "type": "integer",
+                "title": "AVG_FREQ_STEP",
+                "description": "corresponds to .freqstep in NDPPP .type=average , or in case of .type=demixer it is the demixer.freqstep",
+                "default": 2,
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "maximum": 1000,
+                "exclusiveMaximum": true,    
+                "propertyOrder": 1
+              },
+              "AVG_TIME_STEP": {
+                "type": "integer",
+                "title": "AVG_TIME_STEP",
+                "description": "corresponds to .timestep in NDPPP .type=average , or in case of .type=demixer it is the demixer.timestep",
+                "default": 4,
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "maximum": 1000,
+                "exclusiveMaximum": true,    
+                "propertyOrder": 2
+              },
+              "DO_DEMIX": {
+                "type": "boolean",
+                "title": "DO_DEMIX",
+                "description": "if true then demixer instead of average is performed",
+                "default": true,
+                "propertyOrder": 3
+              },
+              "DEMIX_FREQ_STEP": {
+                "type": "integer",
+                "title": "DEMIX_FREQ_STEP",
+                "description": "corresponds to .demixfreqstep in NDPPP .type=demixer",
+                "default": 2,
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "maximum": 1000,
+                "exclusiveMaximum": true,    
+                "propertyOrder": 4
+              },
+              "DEMIX_TIME_STEP": {
+                "type": "integer",
+                "title": "DEMIX_TIME_STEP",
+                "description": "corresponds to .demixtimestep in NDPPP .type=demixer",
+                "default": 2,
+                "minimum": 0,
+                "exclusiveMinimum": true,
+                "maximum": 1000,
+                "exclusiveMaximum": true,    
+                "propertyOrder": 5
+              },
+              "DEMIX_SOURCES": {
+                "type": "string",
+                "description": "",
+                "title": "DEMIX_SOURCES",
+                "format": "select",
+                "enum": [
+                  "CasA",
+                  "CygA"
+                ],
+                "propertyOrder": 6
+              },
+              "SELECT_NL": {
+                "type": "boolean",
+                "title": "SELECT_NL",
+                "description": "if true then only Dutch stations are selected",
+                "default": true,
+                "propertyOrder": 7
+              },
+              "PARSET": {
+                "type": "string",
+                "title": "PARSET",
+                "description": "",
+                "format": "select",
+                "enum": [
+                  "",
+                  "hba_npp",
+                  "hba_raw",
+                  "lba_npp",
+                  "lba_raw"
+                ],
+                "default": "lba_npp",
+                "propertyOrder": 8
+              }},
+              "required": [
+                  "AVG_FREQ_STEP",
+                  "AVG_TIME_STEP",
+                  "DO_DEMIX",
+                  "DEMIX_FREQ_STEP",
+                  "DEMIX_TIME_STEP",
+                  "DEMIX_SOURCES",
+                  "SELECT_NL",
+                  "PARSET"
+              ]
+            },
+        initialValues: {
+            "avg_freq_step": 2,
+            "avg_time_step": 4,
+            "do_demix": true,
+            "demix_freq_step": 2,
+            "demix_time_step": 2,
+            "demix_sources": "CasA",
+            "select_nl": true,
+            "parset": "lba_npp"
+        },
+        endpoint: '/sessions'
+      }
+    };
   }
 
-    handleChange(selectedOption) {
-    this.setState({ selectedOption });
-    //console.log(`Selected: ${selectedOption.label}`);
+  handleChange(selectedOption) {
+    if (selectedOption) {
+      this.setState({ selectedOption, selectedPipeline: this.pipelines[selectedOption.value] });
+    } else {
+      this.setState({ selectedOption, selectedPipeline: undefined });
+    }
   }
 
   customInfoButton(cell, row, enumObject, rowIndex) {
@@ -769,29 +598,6 @@ export default class FRBTable extends React.Component {
   }
 
   closeColumnDialog() {
-    // undo changes and close modal
-    var arrayLength = this.state['arraylist'].length;
-    for (var i = 0; i < arrayLength; i++) {
-      // undo changes
-      var cname = this.state['arraylist'][i]
-      this.changeStateAttributeValue('hiddenColumnsTemp', cname, this.state['hiddenColumns'][cname]);
-    }
-    // remove everything from arraylist
-    this.setState({ arraylist: [] });
-    // close modal
-    this.setState({ showModal: false });    
-  }
-
-  applyColumnDialog() {
-    // apply changes and close modal
-    var arrayLength = this.state['arraylist'].length;
-    for (var i = 0; i < arrayLength; i++) {
-      // apply changes
-      var cname = this.state['arraylist'][i]
-      this.changeStateAttributeValue('hiddenColumns', cname, this.state['hiddenColumnsTemp'][cname]);
-    }
-    // remove everything from arraylist
-    this.setState({ arraylist: [] });
     // close modal
     this.setState({ showModal: false });    
   }
@@ -998,6 +804,9 @@ export default class FRBTable extends React.Component {
       clearSearchBtn: this.createCustomClearButton,
       btnGroup: this.createCustomButtonGroup,
     };
+    
+    const pipelineChoices = Object.getOwnPropertyNames(this.pipelines).map(p => {return {value: p, label: this.pipelines[p].label}});
+
     // Define select column modal entries
     // don't recall db for each overview for now, too slow
     // <ProdIdComponent prod_id={this.state.meas.PRODUCTID} />
@@ -1049,15 +858,10 @@ export default class FRBTable extends React.Component {
             value={this.state.selectedOption}
             onChange={this.handleChange}
             searchable={true}
-            options={[
-                      { value: 'LGPPP', label: 'LOFAR GRID Pre-Processing Pipeline' },
-                      { value: 'two', label: 'Pipeline 2' },
-                      { value: 'three', label: 'Pipeline 3' },
-                      { value: 'four', label: 'Pipeline 4' },
-                    ]}
+            options={pipelineChoices}
             placeholder="Select pipeline..."
         />
-        <PipelineConfigurator pipeline={this.state.selectedOption} />
+        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} /> }
 </th></tr>
 </tbody>
 </table>
