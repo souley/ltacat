@@ -239,7 +239,7 @@ class PipelineConfigurator extends React.Component {
   }
   processResponse(resultConfig) {
     this.setState({submitted: true,
-                   resultConfig});
+                   resultConfig: resultConfig.config});
   }
   handleError(error) {
     this.setState({submitted: true,
@@ -249,8 +249,9 @@ class PipelineConfigurator extends React.Component {
   submit() {
     const id = this.props.pipeline.id
     const email = this.props.email
+    const description = this.props.description
     const submitEndpoint = '/sessions'
-    const body = {id, email, config: JSON.stringify(this.state.config)}
+    const body = {id, email, description, config: (this.state.config)}
     fetch(submitEndpoint, {
         body: JSON.stringify(body),
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -453,7 +454,8 @@ export default class FRBTable extends React.Component {
       pipelines: undefined,
       email: undefined,
       validEmail: false,
-      validationMessageEmail: undefined
+      validationMessageEmail: undefined,
+      jobDescription: undefined
     };
     this.showall = this.showall.bind(this);
     this.closeColumnDialog = this.closeColumnDialog.bind(this);
@@ -465,6 +467,7 @@ export default class FRBTable extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.getPipelines = this.getPipelines.bind(this);
     this.updateEmail = this.updateEmail.bind(this);
+    this.updateJobDescription = this.updateJobDescription.bind(this);
   }
   componentDidMount() {
     this.getPipelines();
@@ -510,6 +513,10 @@ export default class FRBTable extends React.Component {
     this.setState({ email: event.currentTarget.value,
                     validEmail: event.currentTarget.validity.valid,
                     validationMessageEmail: event.currentTarget.validationMessage })
+  }    
+
+  updateJobDescription(event) {
+    this.setState({ jobDescription: event.currentTarget.value })
   }    
 
   closeColumnDialog() {
@@ -732,8 +739,8 @@ export default class FRBTable extends React.Component {
         <tr><th colSpan='3'>Data Processing</th></tr>
         <tr><th colSpan='3'>
         <form>
+          <label className="control-label">E-mail address:</label> 
           <div className={this.state.validEmail ? '': 'has-error'}>
-            <label className="control-label">E-mail address:</label> 
             <input id="emailAddress"
               type='email'
               placeholder="Enter your email"
@@ -744,9 +751,21 @@ export default class FRBTable extends React.Component {
               required/>
               { !this.state.validEmail && <div className="help-block">{this.state.validationMessageEmail ? this.state.validationMessageEmail : 'Please fill out this field.'}</div> }
           </div>
+          <label className="control-label">Job description:</label> 
+          <div className={this.state.jobDescription ? '': 'has-error'}>
+            <input id="jobDescription"
+              type='text'
+              placeholder="The job description will be used as a reminder for yourself."
+              name='jobDescripton'
+              defaultValue={this.state.jobDescription}
+              onChange={this.updateJobDescription}
+              className="form-control"
+              required/>
+              { !this.state.jobDescription && <div className="help-block">{this.state.jobDescription? '': 'Please fill out this field.'}</div> }
+          </div>
         <tr><td>Select processing pipeline:</td></tr>
         { pipelineSelect }
-        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} email={this.state.email} validEmail={this.state.validEmail}/> }
+        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} email={this.state.email} validEmail={this.state.validEmail} description={this.state.jobDescription}/> }
       </form>
 </th></tr>
 </tbody>
