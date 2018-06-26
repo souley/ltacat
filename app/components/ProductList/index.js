@@ -443,8 +443,8 @@ export default class FRBTable extends React.Component {
       // dropdown
       selectedOption: undefined,
       selectedPipeline: undefined,
+      pipelines: undefined
     };
-    this.pipelines = {}
     this.showall = this.showall.bind(this);
     this.closeColumnDialog = this.closeColumnDialog.bind(this);
     this.createCustomButtonGroup = this.createCustomButtonGroup.bind(this);
@@ -459,116 +459,25 @@ export default class FRBTable extends React.Component {
     this.getPipelines();
   }
   getPipelines() {
-      this.pipelines = { 
-      'LGPPP': {
-        label: 'LOFAR GRID Pre-Processing Pipeline',
-        schema: {
-            "type": "object",
-            "title": "Configuration Parameters:",
-            "description": "This is the LOFAR GRID Pre-Processing Pipeline. Here we print a description of the pipeline.",
-            "properties": {
-              "AVG_FREQ_STEP": {
-                "type": "integer",
-                "title": "AVG_FREQ_STEP",
-                "description": "corresponds to .freqstep in NDPPP .type=average , or in case of .type=demixer it is the demixer.freqstep",
-                "default": 2,
-                "minimum": 0,
-                "exclusiveMinimum": true,
-                "maximum": 1000,
-                "exclusiveMaximum": true,    
-                "propertyOrder": 1
-              },
-              "AVG_TIME_STEP": {
-                "type": "integer",
-                "title": "AVG_TIME_STEP",
-                "description": "corresponds to .timestep in NDPPP .type=average , or in case of .type=demixer it is the demixer.timestep",
-                "default": 4,
-                "minimum": 0,
-                "exclusiveMinimum": true,
-                "maximum": 1000,
-                "exclusiveMaximum": true,    
-                "propertyOrder": 2
-              },
-              "DO_DEMIX": {
-                "type": "boolean",
-                "title": "DO_DEMIX",
-                "description": "if true then demixer instead of average is performed",
-                "default": true,
-                "propertyOrder": 3
-              },
-              "DEMIX_FREQ_STEP": {
-                "type": "integer",
-                "title": "DEMIX_FREQ_STEP",
-                "description": "corresponds to .demixfreqstep in NDPPP .type=demixer",
-                "default": 2,
-                "minimum": 0,
-                "exclusiveMinimum": true,
-                "maximum": 1000,
-                "exclusiveMaximum": true,    
-                "propertyOrder": 4
-              },
-              "DEMIX_TIME_STEP": {
-                "type": "integer",
-                "title": "DEMIX_TIME_STEP",
-                "description": "corresponds to .demixtimestep in NDPPP .type=demixer",
-                "default": 2,
-                "minimum": 0,
-                "exclusiveMinimum": true,
-                "maximum": 1000,
-                "exclusiveMaximum": true,    
-                "propertyOrder": 5
-              },
-              "DEMIX_SOURCES": {
-                "type": "string",
-                "description": "",
-                "title": "DEMIX_SOURCES",
-                "format": "select",
-                "enum": [
-                  "CasA",
-                  "CygA"
-                ],
-                "propertyOrder": 6
-              },
-              "SELECT_NL": {
-                "type": "boolean",
-                "title": "SELECT_NL",
-                "description": "if true then only Dutch stations are selected",
-                "default": true,
-                "propertyOrder": 7
-              },
-              "PARSET": {
-                "type": "string",
-                "title": "PARSET",
-                "description": "",
-                "format": "select",
-                "enum": [
-                  "",
-                  "hba_npp",
-                  "hba_raw",
-                  "lba_npp",
-                  "lba_raw"
-                ],
-                "default": "lba_npp",
-                "propertyOrder": 8
-              }},
-              "required": [
-                  "AVG_FREQ_STEP",
-                  "AVG_TIME_STEP",
-                  "DO_DEMIX",
-                  "DEMIX_FREQ_STEP",
-                  "DEMIX_TIME_STEP",
-                  "DEMIX_SOURCES",
-                  "SELECT_NL",
-                  "PARSET"
-              ]
-            },
-        endpoint: '/sessions'
-      }
-    };
+    const listPipelines = '/pipelines.json'
+    fetch(listPipelines, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        headers: {
+          'content-type': 'application/json'
+        },
+      })
+      .then(response => {if (response.ok)
+                           return response.json()
+                         else
+                           throw 'Server returned ' + response.statusText})
+      .then(pipelines => this.setState({pipelines})) // parses response to JSON
+      .catch(this.handleError)
   }
+
   handleChange(selectedOption) {
     if (selectedOption) {
-      this.setState({ selectedOption, selectedPipeline: this.pipelines[selectedOption.value] });
+      this.setState({ selectedOption, selectedPipeline: this.state.pipelines[selectedOption.value] });
     } else {
       this.setState({ selectedOption, selectedPipeline: undefined });
     }
@@ -744,8 +653,22 @@ export default class FRBTable extends React.Component {
       btnGroup: this.createCustomButtonGroup,
     };
     
-    const pipelineChoices = Object.getOwnPropertyNames(this.pipelines).map(p => {return {value: p, label: this.pipelines[p].label}});
-
+    const pipelinesLoaded = this.state.pipelines && Object.getOwnPropertyNames(this.state.pipelines).length > 0;
+    let pipelineSelect = <div>Loading pipelines</div>;
+    if (pipelinesLoaded) {
+      const pipelineChoices = Object.getOwnPropertyNames(this.state.pipelines).map(p => {return {value: p, label: this.state.pipelines[p].label}});
+      pipelineSelect = (
+         <Select
+              name="form-field-name"
+              value={this.state.selectedOption}
+              onChange={this.handleChange}
+              searchable={true}
+              options={pipelineChoices}
+              placeholder="Select pipeline..."
+          />
+      );
+    }
+    
     // Define select column modal entries
     // don't recall db for each overview for now, too slow
     // <ProdIdComponent prod_id={this.state.meas.PRODUCTID} />
@@ -792,14 +715,7 @@ export default class FRBTable extends React.Component {
         <tr><th colSpan='3'>Data Processing</th></tr>
         <tr><th colSpan='3'>
         <tr><td>Select processing pipeline:</td></tr>
-        <Select
-            name="form-field-name"
-            value={this.state.selectedOption}
-            onChange={this.handleChange}
-            searchable={true}
-            options={pipelineChoices}
-            placeholder="Select pipeline..."
-        />
+        { pipelineSelect }
         { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} /> }
 </th></tr>
 </tbody>
