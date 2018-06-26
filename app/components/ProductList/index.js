@@ -285,7 +285,6 @@ class PipelineConfigurator extends React.Component {
         <JSONEditor 
             title="Pipeline configuration"
             schema={this.props.pipeline.schema}
-            initialValue={this.props.pipeline.initialValues}
             updateValue={this.updateDerived}
             theme="bootstrap4"
             icon="fontawesome5">
@@ -445,16 +444,22 @@ export default class FRBTable extends React.Component {
       selectedOption: undefined,
       selectedPipeline: undefined,
     };
+    this.pipelines = {}
     this.showall = this.showall.bind(this);
     this.closeColumnDialog = this.closeColumnDialog.bind(this);
     this.createCustomButtonGroup = this.createCustomButtonGroup.bind(this);
-    this.getCSVFilename = this.getCSVFilename.bind(this);
     this.changeStateAttributeValue = this.changeStateAttributeValue.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
     this.sizePerPageListChange = this.sizePerPageListChange.bind(this);
     this.customInfoButton = this.customInfoButton.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.pipelines = { 
+    this.getPipelines = this.getPipelines.bind(this);
+  }
+  componentDidMount() {
+    this.getPipelines();
+  }
+  getPipelines() {
+      this.pipelines = { 
       'LGPPP': {
         label: 'LOFAR GRID Pre-Processing Pipeline',
         schema: {
@@ -557,21 +562,10 @@ export default class FRBTable extends React.Component {
                   "PARSET"
               ]
             },
-        initialValues: {
-            "avg_freq_step": 2,
-            "avg_time_step": 4,
-            "do_demix": true,
-            "demix_freq_step": 2,
-            "demix_time_step": 2,
-            "demix_sources": "CasA",
-            "select_nl": true,
-            "parset": "lba_npp"
-        },
         endpoint: '/sessions'
       }
     };
   }
-
   handleChange(selectedOption) {
     if (selectedOption) {
       this.setState({ selectedOption, selectedPipeline: this.pipelines[selectedOption.value] });
@@ -591,11 +585,6 @@ export default class FRBTable extends React.Component {
 </button>
     );
   }
-  getCSVFilename() {
-    // define filename for export csv utility
-    const datestamp = (new Date()).toISOString().slice(0,10).replace(/-/g,"")
-    return this.state.CSVFilename + "_" + datestamp + "." + this.state.CSVExtension;
-  }
 
   closeColumnDialog() {
     // close modal
@@ -603,7 +592,6 @@ export default class FRBTable extends React.Component {
   }
 
   openColumnDialog(meas, e) {
-      console.log(meas);
       this.setState({ showModal: true,
                       meas });
   }
@@ -651,55 +639,6 @@ export default class FRBTable extends React.Component {
   onPageChange(page, sizePerPage) {
     // set page number
     this.setState({page: page});
-  }
-
-  isExpandableRow(row) {
-    return true;
-  }
-
-  handlerClickCleanFiltered() {
-    // remove all filters
-    this.refs.frb_name.cleanFiltered();
-    this.refs.telescope.cleanFiltered();
-    this.refs.utc.cleanFiltered();
-    this.refs.rop_raj.cleanFiltered();
-    this.refs.rop_decj.cleanFiltered();
-    this.refs.rop_gl.cleanFiltered();
-    this.refs.rop_gb.cleanFiltered();
-    this.refs.rop_receiver.cleanFiltered();
-    this.refs.rop_backend.cleanFiltered();
-    this.refs.rop_beam.cleanFiltered();
-    this.refs.rop_beam_semi_major_axis.cleanFiltered();
-    this.refs.rop_beam_semi_minor_axis.cleanFiltered();
-    this.refs.rop_beam_rotation_angle.cleanFiltered();
-    this.refs.rop_sampling_time.cleanFiltered();
-    this.refs.rop_bandwidth.cleanFiltered();
-    this.refs.rop_centre_frequency.cleanFiltered();
-    this.refs.rop_npol.cleanFiltered();
-    this.refs.rop_bits_per_sample.cleanFiltered();
-    this.refs.rop_gain.cleanFiltered();
-    this.refs.rop_tsys.cleanFiltered();
-    this.refs.rop_mw_dm_limit.cleanFiltered();
-    this.refs.rop_galactic_electron_model.cleanFiltered();
-    this.refs.rmp_dm.cleanFiltered();
-    this.refs.rmp_width.cleanFiltered();
-    this.refs.rmp_snr.cleanFiltered();
-    this.refs.rmp_flux.cleanFiltered();
-    this.refs.rmp_dm_index.cleanFiltered();
-    this.refs.rmp_scattering_index.cleanFiltered();
-    this.refs.rmp_scattering.cleanFiltered();
-    this.refs.rmp_scattering_model.cleanFiltered();
-    this.refs.rmp_scattering_timescale.cleanFiltered();
-    this.refs.rmp_linear_poln_frac.cleanFiltered();
-    this.refs.rmp_circular_poln_frac.cleanFiltered();
-    this.refs.rmp_spectral_index.cleanFiltered();
-    this.refs.rmp_rm.cleanFiltered();
-    this.refs.rmp_redshift_host.cleanFiltered();
-    this.refs.rmp_dispersion_smearing.cleanFiltered();
-  }
-
-  handleClearButtonClick(onClick) {
-    this.props.search('');
   }
 
   showall(onClick) {
