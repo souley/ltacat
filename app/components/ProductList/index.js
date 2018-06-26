@@ -220,7 +220,8 @@ class PipelineConfigurator extends React.Component {
       resultConfig: {},
       submitted: false,
       config: {},
-      error: ''
+      error: '',
+      validSubForm: true,
     };
     this.updateDerived = this.updateDerived.bind(this);
     this.submit = this.submit.bind(this);
@@ -229,10 +230,12 @@ class PipelineConfigurator extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return this.props.pipeline !== nextProps.pipeline || nextState.submitted  !== this.state.submitted
+    return this.props.pipeline !== nextProps.pipeline || nextState.submitted  !== this.state.submitted || nextProps.validEmail !== this.props.validEmail || nextState.validSubForm !== this.state.validSubForm
   }
-  updateDerived(config) {
-    this.setState({config});
+  updateDerived(config, validSubForm) {
+    this.setState({config,
+                   validSubForm
+                  });
   }
   processResponse(resultConfig) {
     this.setState({submitted: true,
@@ -244,9 +247,12 @@ class PipelineConfigurator extends React.Component {
   }
 
   submit() {
-    const submitEndpoint = this.props.pipeline.endpoint
+    const id = this.props.pipeline.id
+    const email = this.props.email
+    const submitEndpoint = '/sessions'
+    const body = {id, email, config: JSON.stringify(this.state.config)}
     fetch(submitEndpoint, {
-        body: JSON.stringify(this.state.config), // must match 'Content-Type' header
+        body: JSON.stringify(body),
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, cors, *same-origin
         headers: {
@@ -286,7 +292,7 @@ class PipelineConfigurator extends React.Component {
             title="Pipeline configuration"
             schema={this.props.pipeline.schema}
             updateValue={this.updateDerived}
-            theme="bootstrap4"
+            theme="bootstrap3"
             icon="fontawesome5">
         </JSONEditor>
       <p></p>
@@ -294,7 +300,8 @@ class PipelineConfigurator extends React.Component {
       <button type='button'
       className={ `btn btn-submit` }
       title='Submit workflow'
-      onClick={this.submit}>
+      onClick={this.submit}
+      disabled={!(this.props.validEmail && this.state.validSubForm)}>
       Submit workflow
       </button>
       </div>
@@ -443,7 +450,10 @@ export default class FRBTable extends React.Component {
       // dropdown
       selectedOption: undefined,
       selectedPipeline: undefined,
-      pipelines: undefined
+      pipelines: undefined,
+      email: undefined,
+      validEmail: false,
+      validationMessageEmail: undefined
     };
     this.showall = this.showall.bind(this);
     this.closeColumnDialog = this.closeColumnDialog.bind(this);
@@ -454,6 +464,7 @@ export default class FRBTable extends React.Component {
     this.customInfoButton = this.customInfoButton.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.getPipelines = this.getPipelines.bind(this);
+    this.updateEmail = this.updateEmail.bind(this);
   }
   componentDidMount() {
     this.getPipelines();
@@ -494,6 +505,12 @@ export default class FRBTable extends React.Component {
 </button>
     );
   }
+
+  updateEmail(event) {
+    this.setState({ email: event.currentTarget.value,
+                    validEmail: event.currentTarget.validity.valid,
+                    validationMessageEmail: event.currentTarget.validationMessage })
+  }    
 
   closeColumnDialog() {
     // close modal
@@ -668,7 +685,7 @@ export default class FRBTable extends React.Component {
           />
       );
     }
-    
+
     // Define select column modal entries
     // don't recall db for each overview for now, too slow
     // <ProdIdComponent prod_id={this.state.meas.PRODUCTID} />
@@ -714,9 +731,23 @@ export default class FRBTable extends React.Component {
         <tbody>
         <tr><th colSpan='3'>Data Processing</th></tr>
         <tr><th colSpan='3'>
+        <form>
+          <div className={this.state.validEmail ? '': 'has-error'}>
+            <label className="control-label">E-mail address:</label> 
+            <input id="emailAddress"
+              type='email'
+              placeholder="Enter your email"
+              name='emailAddress'
+              defaultValue={this.state.email}
+              onChange={this.updateEmail}
+              className="form-control"
+              required/>
+              { !this.state.validEmail && <div className="help-block">{this.state.validationMessageEmail ? this.state.validationMessageEmail : 'Please fill out this field.'}</div> }
+          </div>
         <tr><td>Select processing pipeline:</td></tr>
         { pipelineSelect }
-        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} /> }
+        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} email={this.state.email} validEmail={this.state.validEmail}/> }
+      </form>
 </th></tr>
 </tbody>
 </table>
