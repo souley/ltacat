@@ -38,7 +38,7 @@ app.all('*', function (req, res, next) {
 });
 
 app.get('/products', products.findAll);
-app.get('/product/:prod_id', products.findByProdId);
+app.get('/product/:lid', products.findByProdId);
 
 app.listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));

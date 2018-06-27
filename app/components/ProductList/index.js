@@ -247,18 +247,28 @@ class PipelineConfigurator extends React.Component {
   }
 
   submit() {
-    const id = this.props.pipeline.id
+    const pipeline = this.props.pipeline.id
     const email = this.props.email
     const description = this.props.description
     const submitEndpoint = '/sessions'
-    const body = {id, email, description, config: (this.state.config)}
-    fetch(submitEndpoint, {
-        body: JSON.stringify(body),
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
-        headers: {
+    fetch('/product/' + this.props.lid, {
+      headers: {
           'content-type': 'application/json'
-        },
+      }
+    }).then(response => {if (response.ok)
+                           return response.json()
+                         else
+                           throw 'Server returned ' + response.statusText})
+      .then(srmuris => {
+        const body = {pipeline, email, description, config: this.state.config, observation: srmuris.products.map((d) => d.URI)};
+        return fetch(submitEndpoint, {
+          body: JSON.stringify(body),
+          method: 'POST', // *GET, POST, PUT, DELETE, etc.
+          mode: 'cors', // no-cors, cors, *same-origin
+          headers: {
+            'content-type': 'application/json'
+          },
+        })
       })
       .then(response => {if (response.ok)
                            return response.json()
@@ -769,7 +779,7 @@ export default class FRBTable extends React.Component {
           </div>
         <tr><td>Select processing pipeline:</td></tr>
         { pipelineSelect }
-        { this.state.selectedPipeline && <PipelineConfigurator pipeline={this.state.selectedPipeline} email={this.state.email} validEmail={this.state.validEmail} description={this.state.jobDescription}/> }
+        { this.state.selectedPipeline && <PipelineConfigurator lid={this.state.meas.LID} pipeline={this.state.selectedPipeline} email={this.state.email} validEmail={this.state.validEmail} description={this.state.jobDescription}/> }
       </form>
 </th></tr>
 </tbody>

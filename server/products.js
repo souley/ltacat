@@ -1,5 +1,5 @@
 "use strict";
-
+const oracledb = require('oracledb');
 let db = require('./database');
 
 let escape = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -44,19 +44,22 @@ let findByProdId = (req, res, next) => {
   search = req.query.search,
   min = req.query.min,
   max = req.query.max,
+  lid = req.params.lid,
+  lidArray = lid.split('-'),
+  bindings = {obs: { dir: oracledb.BIND_IN, val: lidArray[0], type: oracledb.STRING },
+              sap: { dir: oracledb.BIND_IN, val: lidArray[1], type: oracledb.STRING }},
   whereParts = [],
   values = [];
-  let prod_id = req.params.prod_id;
   let sql = `
   SELECT
-uri
+fo.uri
 FROM
 AWOPER.CorrelatedDataProduct p
 JOIN awoper.FileObject fo ON fo.DATA_OBJECT = p.OBJECT_ID
 WHERE
-observation=hextoraw('D548B55F0C2A01BCE043C616A9C30957')
+observation=hextoraw(:obs)
 AND
-subarraypointing=hextoraw('D548B55F0C2901BCE043C616A9C30957')
+subarraypointing=hextoraw(:sap)
 `
 /*
   ['SELECT fo.URI as uri, fo.hash_md5 as hash, dp."dataProductType" as type, ',
@@ -70,7 +73,7 @@ subarraypointing=hextoraw('D548B55F0C2901BCE043C616A9C30957')
             'AND dp."isValid" > 0 ',
             'AND dp."dataProductIdentifier" = ' + prod_id].join('\n');
 */
-    db.query(sql, values.concat([]))
+    db.query(sql, bindings)
     .then(products => {
       return res.json({"products": products});
     })
