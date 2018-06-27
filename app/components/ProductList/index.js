@@ -636,20 +636,20 @@ export default class FRBTable extends React.Component {
                           return { width: '60px', textAlign: 'center' };
                       }
                     }, {
-                      dataField: 'URI',
-                      text: 'URI'
+                      dataField: 'STARTTIME',
+                      text: 'STARTTIME'
                     }, {
-                      dataField: 'HASH',
-                      text: 'HASH'
+                      dataField: 'ENDTIME',
+                      text: 'ENDTIME'
                     }, {
-                      dataField: 'TYPE',
-                      text: 'TYPE'
+                      dataField: 'RIGHTASCENSION',
+                      text: 'RIGHTASCENSION'
                     }, {
-                      dataField: 'PRODUCTID',
-                      text: 'PRODUCTID'
+                      dataField: 'DECLINATION',
+                      text: 'DECLINATION'
                     }, {
-                      dataField: 'PROCESSID',
-                      text: 'PROCESSID'
+                      dataField: 'NR_SUBBANDS',
+                      text: 'NR_SUBBANDS'
                     }];
     // set sorting options
     const options = {
@@ -712,20 +712,24 @@ export default class FRBTable extends React.Component {
                   <tbody>
                     <tr><th colSpan='3'>Product Parameters</th></tr>
                     <tr>
-                      <td width='50%'><b>Product ID</b></td>
-                      <td colSpan='2'>{this.state.meas.PRODUCTID}</td>
+                      <td width='50%'><b>Start time</b></td>
+                      <td colSpan='2'>{this.state.meas.STARTTIME}</td>
                     </tr>
                     <tr>
-                      <td width='50%'><b>URI</b></td>
-                      <td colSpan='2'>{this.state.meas.URI}</td>
+                      <td width='50%'><b>End time</b></td>
+                      <td colSpan='2'>{this.state.meas.ENDTIME}</td>
                     </tr>
                     <tr>
-                      <td width='50%'><b>HASH</b></td>
-                      <td colSpan='2'>{this.state.meas.HASH}</td>
+                      <td width='50%'><b>Right Ascension</b></td>
+                      <td colSpan='2'>{this.state.meas.RIGHTASCENSION}</td>
                     </tr>
                     <tr>
-                      <td width='50%'><b>UTC</b></td>
-                      <td colSpan='2'></td>
+                      <td width='50%'><b>Declination</b></td>
+                      <td colSpan='2'>{this.state.meas.DECLINATION}</td>
+                    </tr>
+                    <tr>
+                      <td width='50%'><b>Nr subbands</b></td>
+                      <td colSpan='2'>{this.state.meas.NR_SUBBANDS}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -777,7 +781,7 @@ export default class FRBTable extends React.Component {
         <Button type="button" onClick={this.closeColumnDialog}>Close</Button>
         </Modal.Footer>
         </Modal>
-        <BootstrapTable keyField = 'URI'
+        <BootstrapTable keyField = 'LID'
                         data = { this.props.products }
                         columns = { columns }
                         pagination={ paginationFactory() }
