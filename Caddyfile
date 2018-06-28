@@ -1,0 +1,7 @@
+localhost   # Your site's address
+
+# API load balancer
+proxy /sessions localhost:8000
+proxy /pipelineschemas localhost:8000
+proxy / localhost:5000
+
