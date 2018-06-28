@@ -1,10 +1,12 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { numberFilter, dateFilter  } from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import * as productService from '../../services/product-service';
 import Select from 'react-select';
 import { JSONEditor } from "react-schema-based-json-editor";
+
 let libraries = {};
 let order= 'desc';
 
@@ -449,8 +451,57 @@ class ProdIdComponent extends React.Component {
 }
 
 //
+/*
+class RangeFilter extends React.Component {
+    constructor(props) {
+        super(props);
+    this.filter = this.filter.bind(this);
+    this.getValue = this.getValue.bind(this);
+    this.getValue2 = this.getValue2.bind(this);
+    }
 
-
+  filter(event) {
+    if (!this.refs.min.value && !this.refs.max.value) {
+      console.log('here0');
+      this.props.onFilter();
+    } else if (this.refs.min.value && !this.refs.max.value) {
+      this.props.onFilter({
+        number: this.getValue(),
+        comparator: Comparator.GT
+      });
+    } else if (!this.refs.min.value && this.refs.max.value) {
+      this.props.onFilter({
+        number: this.getValue2(),
+        comparator: Comparator.LT
+      });
+    } else if (this.refs.min.value && this.refs.max.value) {
+      this.props.onFilter({
+        number: this.getValue(),
+        comparator: Comparator.GT
+      });
+      this.props.onFilter({
+        number: this.getValue2(),
+        comparator: Comparator.LT
+      });
+    }
+  }
+    getValue() {
+      return this.refs.min.value;
+    }
+    getValue2() {
+      return this.refs.max.value;
+    }
+    
+    render() {
+      return (
+        <div>
+          <input ref="min" type="number" className="filter" onChange={this.filter.bind(this)} placeholder="min" />
+          <input ref="max" type="number" className="filter" onChange={this.filter.bind(this)} placeholder="max" />
+          </div>
+      );
+    }
+};
+*/
 export default class FRBTable extends React.Component {
   constructor(props) {
     super(props);
@@ -482,6 +533,7 @@ export default class FRBTable extends React.Component {
   componentDidMount() {
     this.getPipelines();
   }
+
   getPipelines() {
     const listPipelines = '/pipelines.json'
     fetch(listPipelines, {
@@ -647,20 +699,33 @@ export default class FRBTable extends React.Component {
                       }
                     }, {
                       dataField: 'STARTTIME',
-                      text: 'STARTTIME'
+                      text: 'STARTTIME',
+                      sort: true,
+                      filter: dateFilter()
                     }, {
                       dataField: 'ENDTIME',
-                      text: 'ENDTIME'
+                      text: 'ENDTIME',
+                      sort: true,
+                      filter: dateFilter()
                     }, {
                       dataField: 'RIGHTASCENSION',
-                      text: 'RIGHTASCENSION'
+                      text: 'RIGHTASCENSION',
+                      sort: true,
+                      filter: numberFilter()
                     }, {
                       dataField: 'DECLINATION',
-                      text: 'DECLINATION'
+                      text: 'DECLINATION',
+                      sort: true,
+                      filter: numberFilter()
                     }, {
                       dataField: 'NR_SUBBANDS',
-                      text: 'NR_SUBBANDS'
+                      text: 'NR_SUBBANDS',
+                      sort: true,
+                      filter: numberFilter()
                     }];
+
+
+
     // set sorting options
     const options = {
       defaultSortName: 'frb_name',  // default sort column name
@@ -795,7 +860,8 @@ export default class FRBTable extends React.Component {
                         data = { this.props.products }
                         columns = { columns }
                         pagination={ paginationFactory() }
-                        hover = { true } />
+                        hover = { true }
+                        filter={ filterFactory() } />
         </div>
     );
   }
