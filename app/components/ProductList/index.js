@@ -219,7 +219,7 @@ class PipelineConfigurator extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      resultConfig: {},
+      result: {},
       submitted: false,
       config: {},
       error: '',
@@ -239,9 +239,9 @@ class PipelineConfigurator extends React.Component {
                    validSubForm
                   });
   }
-  processResponse(resultConfig) {
+  processResponse(result) {
     this.setState({submitted: true,
-                   resultConfig: resultConfig.config});
+                   result});
   }
   handleError(error) {
     this.setState({submitted: true,
@@ -291,10 +291,23 @@ class PipelineConfigurator extends React.Component {
       } else {
         return (
           <div class="alert alert-success" role="alert">
-            Submitted, response from server:
+            <b>Submitted</b>:
             <ul>
-              {Object.getOwnPropertyNames(this.state.resultConfig).map((key) => <li key={key}>{key}: {this.state.resultConfig[key]}</li>)}
+              <li>pipeline: {this.state.result.pipeline}</li>
+              <li>version: {this.state.result.pipeline_version}</li>
+              <li>status: {this.state.result.status}</li>
             </ul>
+            <br />
+            <b>Configuration</b>:
+            <ul>
+              {Object.getOwnPropertyNames(this.state.result.config).map((key) => <li key={key}>{key}: {this.state.result.config[key].toString()}</li>)}
+            </ul>
+            <br />
+            <b>Response from server</b>:
+            <ul>
+            {this.state.result.pipeline_respone}
+            </ul>
+           <br />
           </div>
         )
       }
@@ -535,7 +548,7 @@ export default class FRBTable extends React.Component {
   }
 
   getPipelines() {
-    const listPipelines = '/pipelines.json'
+    const listPipelines = '/pipelineschemas'
     fetch(listPipelines, {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, cors, *same-origin
@@ -543,11 +556,12 @@ export default class FRBTable extends React.Component {
           'content-type': 'application/json'
         },
       })
-      .then(response => {if (response.ok)
+      .then(response => {
+                         if (response.ok)
                            return response.json()
                          else
                            throw 'Server returned ' + response.statusText})
-      .then(pipelines => this.setState({pipelines})) // parses response to JSON
+      .then(pipelines => this.setState({pipelines: pipelines.pipelineschemas})) // parses response to JSON
       .catch(this.handleError)
   }
 
