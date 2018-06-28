@@ -262,7 +262,7 @@ class PipelineConfigurator extends React.Component {
                          else
                            throw 'Server returned ' + response.statusText})
       .then(srmuris => {
-        const body = {pipeline, email, description, config: this.state.config, observation: srmuris.products.map((d) => d.URI)};
+        const body = {pipeline, email, description, config: this.state.config, observation: srmuris.products.map((d) => d.URI).join('|')};
         return fetch(submitEndpoint, {
           body: JSON.stringify(body),
           method: 'POST', // *GET, POST, PUT, DELETE, etc.
