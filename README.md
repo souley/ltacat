@@ -1,23 +1,16 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1204941.svg)](https://doi.org/10.5281/zenodo.1204941)
+# Lofar Long Term Archive pipeline orcestrate web application
 
-# frbcat-web
-This is the web frontend to the FRB Catalogue. This catalogue contains up to date information for the published population of Fast Radio Bursts (FRBs). The catalog connects to a postgres database, which is defined in the frbcatdb python package. For detailed information on the database format, see the frbcatdb package, or directly the [create table script](https://github.com/AA-ALERT/frbcatdb/blob/master/db/create_db_tables.sql).
+The is the frontend and the db backend of the web application which can be used to run a pipeline on several data products in the Lofar Long Term Archive.
+To run pipeline the https://github.com/EOSC-LOFAR/lofar_workflow_api web service is required.
+
+![Architecture](architecture.png "Architecture")
 
 ### Configuration:
-frbcat-web has two configuration files.
 
-  * server/config.js
-
-    This file contains the postgres connection string. Modify it to connect to your postgres installation and table. The connectionstring has the following format: 'postgres://someuser:somepassword@somehost:someport/somedatabase'
-
-
-    This file also contains the URL to the static csv file that should be on the webpage. 
- 
-  * server.js
-  
-    This file contains the express web server configuration. Here you can define the port the server is running on.
-
-For further details on how to tune the express server for performance in a production environment see the [expressjs homepage](https://expressjs.com/en/advanced/best-practice-performance.html). This link contains information on how to set the NODE_ENV to production for different systems and how to make sure the server gets automatically restarted if it crashes.
+To run the following enviroonment variables must be set:
+* HR_CONNECTIONSTRING, connection string to Lofar database (optional)
+* HR_USER, username to connect to Lofar database
+* HR_PASSWORD, password to connect to Lofar database
 
 ### Installation:
 To install frbcat-web, please follow the following steps. First we need to install the dependencies of frbcat-web using the following commands:
@@ -33,5 +26,12 @@ Next, we build the package using:
 ### Running the express server with frbcat-web:
 To start the express server with frbcat-web loaded use the following command:
 ```
-  npm run start
+npm run start
 ```
+
+To run both backends behind the same server use [CaddyServer](https://caddyserver.com/) by running it in root of this repo with:
+```
+caddy
+```
+
+The web application is running at http://localhost:2015
