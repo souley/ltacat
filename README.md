@@ -15,7 +15,7 @@ To run the following enviroonment variables must be set:
 ### Installation:
 To install frbcat-web, please follow the following steps. First we need to install the dependencies of frbcat-web using the following commands:
 ```
-  npm install
+  npm ci
 ```
 Next, we build the package using:
 
