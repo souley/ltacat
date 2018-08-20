@@ -5,9 +5,15 @@ To run pipeline the https://github.com/EOSC-LOFAR/lofar_workflow_api web service
 
 ![Architecture](architecture.png "Architecture")
 
+
+### Dependencies:
+
+  - oracle instantclient basic (tested with version 18.3)
+  - npm
+ 
 ### Configuration:
 
-To run the following enviroonment variables must be set:
+To run the following variables must be set in server/db-config.js before building the package:
 * HR_CONNECTIONSTRING, connection string to Lofar database (optional)
 * HR_USER, username to connect to Lofar database
 * HR_PASSWORD, password to connect to Lofar database
@@ -23,15 +29,15 @@ Next, we build the package using:
   npm run webpack
 ```
 
-### Running the express server with frbcat-web:
+### Running the express server with ltacat:
 To start the express server with frbcat-web loaded use the following command:
 ```
 npm run start
 ```
 
-To run both backends behind the same server use [CaddyServer](https://caddyserver.com/) by running it in root of this repo with:
+To run both backends (ltacat and [lofar_workflow_api](https://github.com/EOSC-LOFAR/lofar_workflow_api)) behind the same server use [CaddyServer](https://caddyserver.com/) by running it in root of this repo with:
 ```
 caddy
 ```
 
-The web application is running at http://localhost:2015
+The web application is running at http://localhost:2015 after running CaddyServer.
