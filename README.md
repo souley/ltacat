@@ -1,5 +1,7 @@
 # Lofar Long Term Archive pipeline orcestrate web application
 
+This project has been continued as part of [PROCESS](https://github.com/process-project/ltacat).
+
 The is the frontend and the db backend of the web application which can be used to run a pipeline on several data products in the Lofar Long Term Archive.
 To run pipeline the https://github.com/EOSC-LOFAR/lofar_workflow_api web service is required.
 
