@@ -6,3 +6,4 @@ __pycache__/*
 **/app.bundle.js.map
 **/db-config.js
 node_modules/**
+**/package-lock.json
