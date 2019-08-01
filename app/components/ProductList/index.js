@@ -305,7 +305,7 @@ class PipelineConfigurator extends React.Component {
             <br />
             <b>Response from server</b>:
             <ul>
-            {this.state.result.pipeline_respone}
+            {this.state.result.pipeline_response}
             </ul>
            <br />
           </div>
@@ -712,6 +712,11 @@ export default class FRBTable extends React.Component {
                           return { width: '60px', textAlign: 'center' };
                       }
                     }, {
+                      dataField: 'OBSERVATIONID',
+                      text: 'OBSERVATIONID',
+                      sort: false,
+                      filter: numberFilter()
+                    }, {
                       dataField: 'STARTTIME',
                       text: 'STARTTIME',
                       sort: true,
@@ -800,6 +805,10 @@ export default class FRBTable extends React.Component {
                 <table className='standard' cellPadding='5px' width='300px'>
                   <tbody>
                     <tr><th colSpan='3'>Product Parameters</th></tr>
+                    <tr>
+                      <td width='50%'><b>Observation ID</b></td>
+                      <td colSpan='2'>{this.state.meas.OBSERVATIONID}</td>
+                    </tr>
                     <tr>
                       <td width='50%'><b>Start time</b></td>
                       <td colSpan='2'>{this.state.meas.STARTTIME}</td>

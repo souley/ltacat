@@ -1,0 +1,8 @@
+__pycache__
+__pycache__/*
+.ipynb_checkpoints
+.DS_Store
+**/app.bundle.js
+**/app.bundle.js.map
+**/db-config.js
+node_modules/**

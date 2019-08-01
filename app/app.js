@@ -59,7 +59,7 @@ class App extends React.Component {
         // return webpage
         return (
             <div>
-                <Header text="LOFAR Processing Catalogue"/>
+                <Header text="UC#2: SKA/LOFAR "/>
                 <LOFARCatTXT/>
                 <ProductList products={this.state.products} total={this.state.total} onSearchKeyChange={this.searchKeyChangeHandler.bind(this)}/>
                 <Footer text="footer"/>

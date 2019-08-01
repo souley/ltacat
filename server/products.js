@@ -14,7 +14,7 @@ let findAll = async (req, res, next) => {
   values = [];
   
   let sql = `SELECT
-nr_subbands, u.observation ||'-'|| u.SUBARRAYPOINTING lid, p.DECLINATION, p.RIGHTASCENSION, o.STARTTIME, o.ENDTIME
+nr_subbands, u.observation ||'-'|| u.SUBARRAYPOINTING lid, p.DECLINATION, p.RIGHTASCENSION, o.STARTTIME, o.ENDTIME, o.OBSERVATIONID
 FROM
 (
 SELECT
